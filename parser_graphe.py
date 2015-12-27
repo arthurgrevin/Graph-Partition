@@ -11,9 +11,10 @@ import matplotlib.pyplot  as plt
 import random as rd
 
 
-def draw_bipartite_graph(G,P1,P2,file_name):
+def draw_bipartite_graph(G,P1,P2,file_name,title):
     print("Drawing graph")
     plt.figure(figsize=(8,6))
+    plt.title(title)
     pos=nx.spring_layout(G)
     nx.draw_networkx_nodes(G,pos,nodelist=P1,node_size=10, node_color='b')
     nx.draw_networkx_nodes(G,pos,nodelist=P2, node_size=10, node_color='r')
@@ -113,7 +114,7 @@ def greedy(G,starting_node):
         P1.extend(new_succesors)
         #print len(P1)
         I = I+1
-        print("Step {}".format(I))
+        #print("Step {}".format(I))
 
         last_successors = new_succesors
 
@@ -127,13 +128,13 @@ def greedy(G,starting_node):
     print "Size of second partition : {}".format(len(P2))
     print "Size of graph : {}".format(G.number_of_nodes())
     print"Number of edges : {}".format(G.number_of_edges())
-    return P1,P2
+    return P1,P2,starting_point
 
 
 
 
 #take A and B lists of nodes in partitions and return the cost of the slice in graph G (total sum of wieghts)
-def cost(A,B,G):
+def cost_slice(A,B,G):
     L = []
     result = 0
     for x in A:
@@ -151,11 +152,37 @@ def cost(A,B,G):
 
 
 G = parse_graph("uk.graph")
-P1,P2 = greedy(G,1000)
-L, cost = cost(P1,P2,G)
-print("Cost of the slice : {}".format(cost))
-draw_bipartite_graph(G,P1,P2,"uk_start_1000")
 
+P1,P2,starting_point = greedy(G,1)
+L, cost = cost_slice(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+title = "UK Starting point : {} P1 : {} P2 : {} Cost : {}".format(starting_point, len(P1), len(P2),cost)
+draw_bipartite_graph(G,P1,P2,"uk_start_1",title)
+
+P1,P2,starting_point = greedy(G,500)
+L, cost = cost_slice(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+title = "UK Starting point : {} P1 : {} P2 : {} Cost : {}".format(starting_point, len(P1), len(P2),cost)
+draw_bipartite_graph(G,P1,P2,"uk_start_500",title)
+
+P1,P2,starting_point = greedy(G,1000)
+L, cost = cost_slice(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+title = "UK Starting point : {} P1 : {} P2 : {} Cost : {}".format(starting_point, len(P1), len(P2),cost)
+draw_bipartite_graph(G,P1,P2,"uk_start_1000",title)
+
+P1,P2,starting_point = greedy(G,1500)
+L, cost = cost_slice(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+title = "UK Starting point : {} P1 : {} P2 : {} Cost : {}".format(starting_point, len(P1), len(P2),cost)
+draw_bipartite_graph(G,P1,P2,"uk_start_1500",title)
+
+
+P1,P2,starting_point = greedy(G,2000)
+L, cost = cost_slice(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+title = "UK Starting point : {} P1 : {} P2 : {} Cost : {}".format(starting_point, len(P1), len(P2),cost)
+draw_bipartite_graph(G,P1,P2,"uk_start_2000",title)
 
 
 
