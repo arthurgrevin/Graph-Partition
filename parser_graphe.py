@@ -8,7 +8,7 @@ Created on Fri Nov 20 00:22:25 2015
 import networkx as nx
 
 import matplotlib.pyplot  as plt
-
+import random as rd
 
 
 def draw_bipartite_graph(G,P1,P2,file_name):
@@ -17,7 +17,11 @@ def draw_bipartite_graph(G,P1,P2,file_name):
     pos=nx.spring_layout(G)
     nx.draw_networkx_nodes(G,pos,nodelist=P1,node_size=10, node_color='b')
     nx.draw_networkx_nodes(G,pos,nodelist=P2, node_size=10, node_color='r')
+
     nx.draw_networkx_edges(G,pos,alpha=0.7)
+    #draw labels
+    #nx.draw_networkx(G,pos, alpha=0,with_labels = True, font_size = 25)
+
     plt.axis('off')
     plt.savefig(file_name)
 
@@ -47,7 +51,7 @@ def parse_graph(file):
             if node.strip() :
                 #print i
                 #print int(node)
-                G.add_edge(i,int(node))
+                G.add_edge(i,int(node),weight=rd.random())
         i=i+1
     return G
 
@@ -68,19 +72,29 @@ def greedy(G,starting_node):
     while found == False:
         new_succesors = []
         x = 0
+        Iterated = [starting_node]
         while(x < len(last_successors) and found == False):
         #for x in last_successors:
             #print("Iterating on node : {} ".format(last_successors[x]))
             succesors = T.successors(last_successors[x])
             #print len(succesors)
-            if(len(succesors) == 0):
+
+            #has only one neighboor
+            if len(G.edge[last_successors[x]].keys()) == 1:
                 found = True
                 starting_point = last_successors[x]
                 print "New starting point : {}".format(starting_point)
             new_succesors.extend(succesors)
             x = x + 1
         last_successors = new_succesors
+        Iterated.extend(last_successors)
         x = 0
+
+        if len(Iterated) >= G.number_of_nodes():
+            print("Iterated over all nodes, no node with only one neighboor")
+
+
+
 
 
     print("Launching greedy algorithm")
@@ -92,6 +106,7 @@ def greedy(G,starting_node):
     I = 0
     while len(P1) <= (G.number_of_nodes()/2):
         new_succesors = []
+        #print "Current partition : {}".format(P1)
         for x in last_successors:
             new_succesors.extend(T.successors(x))
 
@@ -116,9 +131,30 @@ def greedy(G,starting_node):
 
 
 
+
+#take A and B lists of nodes in partitions and return the cost of the slice in graph G (total sum of wieghts)
+def cost(A,B,G):
+    L = []
+    result = 0
+    for x in A:
+        for y in B:
+            node = G.get_edge_data(x,y)
+            if node != None:
+                L.append((x,y))
+                result += node["weight"]
+                #print(result)
+    #print("global cost of slice : {}".format(result))
+    #print("List : {}".format(L))
+    return L,result
+
+
+
+
 G = parse_graph("uk.graph")
-P1,P2 = greedy(G,1)
-draw_bipartite_graph(G,P1,P2,"uk_start1.png")
+P1,P2 = greedy(G,1000)
+L, cost = cost(P1,P2,G)
+print("Cost of the slice : {}".format(cost))
+draw_bipartite_graph(G,P1,P2,"uk_start_1000")
 
 
 
